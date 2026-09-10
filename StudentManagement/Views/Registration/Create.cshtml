@@ -1,0 +1,59 @@
+@model StudentManagement.Models.RegistrationCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Registration</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+           
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Registration.StudentId" class="control-label"></label>
+                <select asp-for="Registration.StudentId" asp-items="Model.Students" class="form-control">
+                    <option value="">-- select student --</option>
+                </select>
+                <span asp-validation-for="Registration.StudentId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Registration.CourseId" class="control-label"></label>
+                <select asp-for="Registration.CourseId" asp-items="Model.Courses" class="form-control">
+                    <option value="">-- select course --</option>
+                </select>
+                <span asp-validation-for="Registration.CourseId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Registration.RegistrationDate" class="control-label"></label>
+                <input asp-for="Registration.RegistrationDate" class="form-control" />
+                <span asp-validation-for="Registration.RegistrationDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Registration.Grade" class="control-label"></label>
+                <input asp-for="Registration.Grade" class="form-control" />
+                <span asp-validation-for="Registration.Grade" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Registration.Status" class="control-label"></label>
+                <input asp-for="Registration.Status" class="form-control" />
+                <span asp-validation-for="Registration.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

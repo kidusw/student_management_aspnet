@@ -1,0 +1,47 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*_i.c
+*_p.c
+*.rsp
+
+# ASP.NET
+wwwroot/lib/
+node_modules/
+
+# User-specific / local config
+appsettings.Development.json
+appsettings.*.local.json
+Properties/serviceDependencies.local.json
+Properties/serviceDependencies.local.json.user
+Properties/serviceDependencies.json
+**/*.csproj.user
+
+# Secrets
+*.pfx
+*.publishsettings
+secrets.json
+
+# Test / coverage
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+*.coverage
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Rider/VS local history
+_ReSharper*/
+*.DotSettings.user
