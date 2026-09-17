@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace StudentManagement.Models
 {
@@ -20,8 +22,12 @@ namespace StudentManagement.Models
 
         public int CreditHours { get; set; }
 
-        [StringLength(100)]
-        public string Department { get; set; } = string.Empty;
+        public int DepartmentId { get; set; }
+
+        [ForeignKey(nameof(DepartmentId))]
+        [Display(Name = "Department")]
+        [ValidateNever]
+        public Department Department { get; set; } = null!;
 
         // Navigation property
         public ICollection<Registration> Registrations { get; set; }

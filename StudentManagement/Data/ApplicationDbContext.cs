@@ -17,6 +17,8 @@ namespace StudentManagement.Data
 
         public DbSet<Registration> Registrations { get; set; } = default!;
 
+        public DbSet<Department> Departments { get; set; } = default!;
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +39,23 @@ namespace StudentManagement.Data
             modelBuilder.Entity<Registration>()
                 .HasIndex(r => new { r.StudentId, r.CourseId })
                 .IsUnique();
+
+            modelBuilder.Entity<Registration>()
+                .Property(r => r.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Department)
+                .WithMany(d => d.Students)
+                .HasForeignKey(s => s.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Course>()
+                .HasOne(c => c.Department)
+                .WithMany(d => d.Courses)
+                .HasForeignKey(c => c.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

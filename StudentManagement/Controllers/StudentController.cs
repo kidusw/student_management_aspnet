@@ -14,9 +14,21 @@ public class StudentController : Controller
     }
 
     // GET: STUDENTS
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchString)
     {
-        return View(await _context.Students.ToListAsync());
+        var students = _context.Students.Include(s => s.Department).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchString))
+        {
+            students = students.Where(s =>
+                s.FirstName.Contains(searchString) ||
+                s.LastName.Contains(searchString) ||
+                (s.FirstName + " " + s.LastName).Contains(searchString));
+        }
+
+        ViewData["CurrentFilter"] = searchString;
+
+        return View(await students.ToListAsync());
     }
 
     // GET: STUDENTS/Details/5
@@ -28,6 +40,9 @@ public class StudentController : Controller
         }
 
         var student = await _context.Students
+            .Include(s => s.Department)
+            .Include(s => s.Registrations)
+                .ThenInclude(r => r.Course)
             .FirstOrDefaultAsync(m => m.StudentId == id);
         if (student == null)
         {
@@ -38,8 +53,9 @@ public class StudentController : Controller
     }
 
     // GET: STUDENTS/Create
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View();
     }
 
@@ -48,14 +64,24 @@ public class StudentController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("StudentId,FirstName,LastName,Age,DateOfBirth,MobileNumber")] Student student)
+    public async Task<IActionResult> Create([Bind("StudentId,FirstName,LastName,Age,DateOfBirth,MobileNumber,DepartmentId")] Student student)
     {
+        var departmentExists = await _context.Departments
+            .AnyAsync(d => d.DepartmentId == student.DepartmentId);
+
+        if (!departmentExists)
+        {
+            ModelState.AddModelError("DepartmentId", "Please select a valid department.");
+        }
+
         if (ModelState.IsValid)
         {
             _context.Add(student);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View(student);
     }
 
@@ -72,6 +98,8 @@ public class StudentController : Controller
         {
             return NotFound();
         }
+
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View(student);
     }
 
@@ -80,11 +108,19 @@ public class StudentController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("StudentId,FirstName,LastName,Age,DateOfBirth,MobileNumber")] Student student)
+    public async Task<IActionResult> Edit(int? id, [Bind("StudentId,FirstName,LastName,Age,DateOfBirth,MobileNumber,DepartmentId")] Student student)
     {
         if (id != student.StudentId)
         {
             return NotFound();
+        }
+
+        var departmentExists = await _context.Departments
+            .AnyAsync(d => d.DepartmentId == student.DepartmentId);
+
+        if (!departmentExists)
+        {
+            ModelState.AddModelError("DepartmentId", "Please select a valid department.");
         }
 
         if (ModelState.IsValid)
@@ -107,6 +143,8 @@ public class StudentController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View(student);
     }
 
@@ -119,6 +157,7 @@ public class StudentController : Controller
         }
 
         var student = await _context.Students
+            .Include(s => s.Department)
             .FirstOrDefaultAsync(m => m.StudentId == id);
         if (student == null)
         {
@@ -146,5 +185,21 @@ public class StudentController : Controller
     private bool StudentExists(int? id)
     {
         return _context.Students.Any(e => e.StudentId == id);
+    }
+
+    private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetDepartmentSelectListAsync()
+    {
+        var departmentsData = await _context.Departments
+            .OrderBy(d => d.Name)
+            .Select(d => new { d.DepartmentId, d.Name })
+            .ToListAsync();
+
+        return departmentsData
+            .Select(d => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = d.DepartmentId.ToString(),
+                Text = d.Name
+            })
+            .ToList();
     }
 }

@@ -50,6 +50,14 @@
             @Html.DisplayFor(model => model.MobileNumber)
         </dd>
     </dl>
+    <dl class="row">
+        <dt class = "col-sm-2">
+            Department
+        </dt>
+        <dd class = "col-sm-10">
+            @Model?.Department.Name
+        </dd>
+    </dl>
     <form asp-action="Delete">
         <input type="hidden" asp-for="StudentId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |

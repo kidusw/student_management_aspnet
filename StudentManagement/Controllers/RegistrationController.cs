@@ -16,9 +16,67 @@ public class RegistrationController : Controller
 
     // GET: REGISTRATIONS
     [HttpGet("")]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(ListRegDto? data)
     {
-        return View(await _context.Registrations.ToListAsync());
+        if (data is null)
+            data = new ListRegDto();
+
+        data.registrations = await _context.Registrations
+            .Include(r => r.Student)
+            .Include(r => r.Course)
+            .Select(r => new RegisterationDto()
+            {
+                Id = r.RegistrationId,
+                Name = String.Concat(r.Student.FirstName, " ", r.Student.LastName),
+                CourseId = r.CourseId,
+                Course = r.Course.CourseName,
+                Grade = r.Grade
+            })
+            .ToListAsync();
+
+        if (!string.IsNullOrWhiteSpace(data.searchString))
+        {
+            data.registrations = data.registrations.Where(r =>
+                r.Name.Contains(data.searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        if (data.SearchCourseId.HasValue)
+        {
+            data.registrations = data.registrations.Where(r =>
+                r.CourseId == data.SearchCourseId.Value).ToList();
+        }
+
+
+        //if (courseId.HasValue)
+        //{
+        //    registrations = registrations.Where(r => r.CourseId == courseId.Value);
+        //}
+
+        data.CourseList = await GetCourseSelectListAsync();
+
+        //foreach (var course in )
+        //{
+        //    course.Selected = courseId.HasValue && course.Value == courseId.Value.ToString();
+        //}
+
+        //ViewData["CurrentFilter"] = searchString;
+        //ViewData["CurrentCourseId"] = courseId;
+        //ViewData["Courses"] = courseList;
+
+        //var data = new List<RegisterationDto>();
+
+        //foreach (var r in registrations)
+        //{
+        //    data.Add(new RegisterationDto
+        //    {
+        //        Id = r.RegistrationId,
+        //        Name = String.Concat(r.Student.FirstName, " ", r.Student.LastName),
+        //        Course = r.Course.CourseName,
+        //        Grade = r.Grade
+        //    });
+        //}
+
+        return View(data);
     }
 
     // GET: REGISTRATIONS/Details/5
@@ -31,6 +89,8 @@ public class RegistrationController : Controller
         }
 
         var registration = await _context.Registrations
+            .Include(r => r.Student)
+            .Include(r => r.Course)
             .FirstOrDefaultAsync(m => m.RegistrationId == id);
         if (registration == null)
         {
@@ -47,40 +107,49 @@ public class RegistrationController : Controller
         var registration = new Registration
         {
             RegistrationDate = DateTime.Now,
-            Status = "Active"
+            Status = RegistrationStatus.Active
         };
 
-        // Load minimal student/course data then project to SelectListItem in memory
+        var vm = new RegistrationCreateViewModel
+        {
+            Registration = registration,
+            Students = await GetStudentSelectListAsync(),
+            Courses = await GetCourseSelectListAsync()
+        };
+
+        return View(vm);
+    }
+
+    private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetStudentSelectListAsync()
+    {
         var studentsData = await _context.Students
             .OrderBy(s => s.FirstName)
             .Select(s => new { s.StudentId, s.FirstName, s.LastName })
             .ToListAsync();
 
+        return studentsData
+            .Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = s.StudentId.ToString(),
+                Text = s.FirstName + " " + s.LastName
+            })
+            .ToList();
+    }
+
+    private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetCourseSelectListAsync()
+    {
         var coursesData = await _context.Courses
             .OrderBy(c => c.CourseName)
             .Select(c => new { c.CourseId, c.CourseName })
             .ToListAsync();
 
-        var vm = new RegistrationCreateViewModel
-        {
-            Registration = registration,
-            Students = studentsData
-                .Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = s.StudentId.ToString(),
-                    Text = s.FirstName + " " + s.LastName
-                })
-                .ToList(),
-            Courses = coursesData
-                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = c.CourseId.ToString(),
-                    Text = c.CourseName
-                })
-                .ToList()
-        };
-
-        return View(vm);
+        return coursesData
+            .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = c.CourseId.ToString(),
+                Text = c.CourseName
+            })
+            .ToList();
     }
 
     // GET: REGISTRATION/GetStudent/5
@@ -135,31 +204,9 @@ public class RegistrationController : Controller
         if (!ModelState.IsValid)
         {
             // Re-populate dropdown data and return view model
-            var studentsData = await _context.Students
-                .OrderBy(s => s.FirstName)
-                .Select(s => new { s.StudentId, s.FirstName, s.LastName })
-                .ToListAsync();
-
-            var coursesData = await _context.Courses
-                .OrderBy(c => c.CourseName)
-                .Select(c => new { c.CourseId, c.CourseName })
-                .ToListAsync();
-
             vm = vm ?? new RegistrationCreateViewModel();
-            vm.Students = studentsData
-                .Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = s.StudentId.ToString(),
-                    Text = s.FirstName + " " + s.LastName
-                })
-                .ToList();
-            vm.Courses = coursesData
-                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = c.CourseId.ToString(),
-                    Text = c.CourseName
-                })
-                .ToList();
+            vm.Students = await GetStudentSelectListAsync();
+            vm.Courses = await GetCourseSelectListAsync();
 
             return View(vm);
         }
@@ -190,7 +237,15 @@ public class RegistrationController : Controller
         {
             return NotFound();
         }
-        return View(registration);
+
+        var vm = new RegistrationCreateViewModel
+        {
+            Registration = registration,
+            Students = await GetStudentSelectListAsync(),
+            Courses = await GetCourseSelectListAsync()
+        };
+
+        return View(vm);
     }
 
     // POST: REGISTRATIONS/Edit/5
@@ -198,34 +253,57 @@ public class RegistrationController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost("Edit/{id?}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("RegistrationId,StudentId,CourseId,RegistrationDate,Grade,Status,Student,Course")] Registration registration)
+    public async Task<IActionResult> Edit(int? id, RegistrationCreateViewModel vm)
     {
+        var registration = vm?.Registration ?? new Registration();
+
         if (id != registration.RegistrationId)
         {
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        var studentExists = await _context.Students
+            .AnyAsync(s => s.StudentId == registration.StudentId);
+
+        if (!studentExists)
         {
-            try
-            {
-                _context.Update(registration);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RegistrationExists(registration.RegistrationId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("Registration.StudentId", "Please select a valid student.");
         }
-        return View(registration);
+
+        var courseExists = await _context.Courses
+            .AnyAsync(c => c.CourseId == registration.CourseId);
+
+        if (!courseExists)
+        {
+            ModelState.AddModelError("Registration.CourseId", "Please select a valid course.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            vm = vm ?? new RegistrationCreateViewModel();
+            vm.Students = await GetStudentSelectListAsync();
+            vm.Courses = await GetCourseSelectListAsync();
+
+            return View(vm);
+        }
+
+        try
+        {
+            _context.Update(registration);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RegistrationExists(registration.RegistrationId))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: REGISTRATIONS/Delete/5
@@ -238,6 +316,8 @@ public class RegistrationController : Controller
         }
 
         var registration = await _context.Registrations
+            .Include(r => r.Student)
+            .Include(r => r.Course)
             .FirstOrDefaultAsync(m => m.RegistrationId == id);
         if (registration == null)
         {

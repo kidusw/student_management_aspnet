@@ -18,7 +18,7 @@
                 <label asp-for="Registration.StudentId" class="control-label"></label>
                 <select asp-for="Registration.StudentId" asp-items="Model.Students" class="form-control">
                     <option value="">-- select student --</option>
-                </select>
+                </select>   
                 <span asp-validation-for="Registration.StudentId" class="text-danger"></span>
             </div>
 
@@ -44,7 +44,7 @@
 
             <div class="form-group">
                 <label asp-for="Registration.Status" class="control-label"></label>
-                <input asp-for="Registration.Status" class="form-control" />
+                <select asp-for="Registration.Status" asp-items="Html.GetEnumSelectList<RegistrationStatus>()" class="form-control"></select>
                 <span asp-validation-for="Registration.Status" class="text-danger"></span>
             </div>
             <div class="form-group">

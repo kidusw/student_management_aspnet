@@ -15,11 +15,11 @@ namespace StudentManagement.Models
 
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
+
         [StringLength(20)]
         public string? Grade { get; set; }
 
-        [StringLength(20)]
-        public string Status { get; set; } = "Active";
+        public RegistrationStatus Status { get; set; } = RegistrationStatus.Active;
 
         // Navigation properties
         // ValidateNever: these aren't posted by the Create/Edit forms (only the

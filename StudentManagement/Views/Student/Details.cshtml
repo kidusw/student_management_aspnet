@@ -2,6 +2,22 @@
 
 @{
     ViewData["Title"] = "Details";
+    var activeRegistrations = Model!.Registrations
+        .Where(r => r.Status == RegistrationStatus.Active)
+        .OrderByDescending(r => r.RegistrationDate)
+        .ToList();
+    var completedRegistrations = Model.Registrations
+        .Where(r => r.Status == RegistrationStatus.Completed)
+        .OrderByDescending(r => r.RegistrationDate)
+        .ToList();
+    var droppedRegistrations = Model.Registrations
+        .Where(r => r.Status == RegistrationStatus.Dropped)
+        .OrderByDescending(r => r.RegistrationDate)
+        .ToList();
+    var cancelledRegistrations = Model.Registrations
+        .Where(r => r.Status == RegistrationStatus.Cancelled)
+        .OrderByDescending(r => r.RegistrationDate)
+        .ToList();
 }
 
 <h1>Details</h1>
@@ -53,8 +69,152 @@
             @Html.DisplayFor(model => model.MobileNumber)
         </dd>
     </dl>
+        <dt class = "col-sm-2">
+            Department
+        </dt>
+        <dd class = "col-sm-10">
+            @Model?.Department.Name
+        </dd>
+    </dl>
 </div>
-<div>
+
+<div class="mt-4">
+    <h4>Active Courses</h4>
+    @if (activeRegistrations.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Registration Date</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var registration in activeRegistrations)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Course" asp-action="Details" asp-route-id="@registration.CourseId">
+                                @registration.Course.CourseCode &ndash; @registration.Course.CourseName
+                            </a>
+                        </td>
+                        <td>@registration.RegistrationDate.ToString("MMMM d, yyyy")</td>
+                        <td>@(string.IsNullOrWhiteSpace(registration.Grade) ? "—" : registration.Grade)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">No active course registrations.</p>
+    }
+</div>
+
+<div class="mt-4">
+    <h4>Completed Courses</h4>
+    @if (completedRegistrations.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Registration Date</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var registration in completedRegistrations)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Course" asp-action="Details" asp-route-id="@registration.CourseId">
+                                @registration.Course.CourseCode &ndash; @registration.Course.CourseName
+                            </a>
+                        </td>
+                        <td>@registration.RegistrationDate.ToString("MMMM d, yyyy")</td>
+                        <td>@(string.IsNullOrWhiteSpace(registration.Grade) ? "—" : registration.Grade)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">No completed courses yet.</p>
+    }
+</div>
+
+<div class="mt-4">
+    <h4>Dropped Courses</h4>
+    @if (droppedRegistrations.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Registration Date</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var registration in droppedRegistrations)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Course" asp-action="Details" asp-route-id="@registration.CourseId">
+                                @registration.Course.CourseCode &ndash; @registration.Course.CourseName
+                            </a>
+                        </td>
+                        <td>@registration.RegistrationDate.ToString("MMMM d, yyyy")</td>
+                        <td>@(string.IsNullOrWhiteSpace(registration.Grade) ? "—" : registration.Grade)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">No dropped courses.</p>
+    }
+</div>
+
+<div class="mt-4">
+    <h4>Cancelled Courses</h4>
+    @if (cancelledRegistrations.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Registration Date</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var registration in cancelledRegistrations)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Course" asp-action="Details" asp-route-id="@registration.CourseId">
+                                @registration.Course.CourseCode &ndash; @registration.Course.CourseName
+                            </a>
+                        </td>
+                        <td>@registration.RegistrationDate.ToString("MMMM d, yyyy")</td>
+                        <td>@(string.IsNullOrWhiteSpace(registration.Grade) ? "—" : registration.Grade)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">No cancelled courses.</p>
+    }
+</div>
+
+<div class="mt-3">
     <a asp-action="Edit" asp-route-id="@Model?.StudentId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

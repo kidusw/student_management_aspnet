@@ -14,9 +14,9 @@ public class CourseController : Controller
     }
 
     // GET: COURSES
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index()
     {
-        return View(await _context.Courses.ToListAsync());
+        return View(await _context.Courses.Include(c => c.Department).ToListAsync());
     }
 
     // GET: COURSES/Details/5
@@ -28,6 +28,7 @@ public class CourseController : Controller
         }
 
         var course = await _context.Courses
+            .Include(c => c.Department)
             .FirstOrDefaultAsync(m => m.CourseId == id);
         if (course == null)
         {
@@ -38,8 +39,9 @@ public class CourseController : Controller
     }
 
     // GET: COURSES/Create
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View();
     }
 
@@ -48,14 +50,24 @@ public class CourseController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("CourseId,CourseCode,CourseName,Description,CreditHours,Department,Registrations")] Course course)
+    public async Task<IActionResult> Create([Bind("CourseId,CourseCode,CourseName,Description,CreditHours,DepartmentId,Registrations")] Course course)
     {
+        var departmentExists = await _context.Departments
+            .AnyAsync(d => d.DepartmentId == course.DepartmentId);
+
+        if (!departmentExists)
+        {
+            ModelState.AddModelError("DepartmentId", "Please select a valid department.");
+        }
+
         if (ModelState.IsValid)
         {
             _context.Add(course);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View(course);
     }
 
@@ -72,6 +84,8 @@ public class CourseController : Controller
         {
             return NotFound();
         }
+
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View(course);
     }
 
@@ -80,11 +94,19 @@ public class CourseController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("CourseId,CourseCode,CourseName,Description,CreditHours,Department,Registrations")] Course course)
+    public async Task<IActionResult> Edit(int? id, [Bind("CourseId,CourseCode,CourseName,Description,CreditHours,DepartmentId,Registrations")] Course course)
     {
         if (id != course.CourseId)
         {
             return NotFound();
+        }
+
+        var departmentExists = await _context.Departments
+            .AnyAsync(d => d.DepartmentId == course.DepartmentId);
+
+        if (!departmentExists)
+        {
+            ModelState.AddModelError("DepartmentId", "Please select a valid department.");
         }
 
         if (ModelState.IsValid)
@@ -107,6 +129,8 @@ public class CourseController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["Departments"] = await GetDepartmentSelectListAsync();
         return View(course);
     }
 
@@ -119,6 +143,7 @@ public class CourseController : Controller
         }
 
         var course = await _context.Courses
+            .Include(c => c.Department)
             .FirstOrDefaultAsync(m => m.CourseId == id);
         if (course == null)
         {
@@ -146,5 +171,21 @@ public class CourseController : Controller
     private bool CourseExists(int? id)
     {
         return _context.Courses.Any(e => e.CourseId == id);
+    }
+
+    private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetDepartmentSelectListAsync()
+    {
+        var departmentsData = await _context.Departments
+            .OrderBy(d => d.Name)
+            .Select(d => new { d.DepartmentId, d.Name })
+            .ToListAsync();
+
+        return departmentsData
+            .Select(d => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = d.DepartmentId.ToString(),
+                Text = d.Name
+            })
+            .ToList();
     }
 }
