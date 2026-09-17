@@ -1,8 +1,177 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model StudentManagement.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    string StatusClass(RegistrationStatus status) => "status-" + status.ToString().ToLowerInvariant();
+
+    var maxDeptStudents = Model.DepartmentSummaries.Any()
+        ? Model.DepartmentSummaries.Max(d => d.StudentCount)
+        : 0;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" /><circle cx="10" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+        </span>
+        <div>
+            <div class="stat-card-value">@Model.TotalStudents</div>
+            <div class="stat-card-label">Students</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></svg>
+        </span>
+        <div>
+            <div class="stat-card-value">@Model.TotalCourses</div>
+            <div class="stat-card-label">Courses</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18" /><path d="M5 21V7l7-4 7 4v14" /><path d="M9 9h1" /><path d="M9 13h1" /><path d="M14 9h1" /><path d="M14 13h1" /><path d="M10 21v-4h4v4" /></svg>
+        </span>
+        <div>
+            <div class="stat-card-value">@Model.TotalDepartments</div>
+            <div class="stat-card-label">Departments</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M9 8h6" /><path d="M9 12h6" /><path d="M9 16h4" /></svg>
+        </span>
+        <div>
+            <div class="stat-card-value">@Model.TotalRegistrations</div>
+            <div class="stat-card-label">Registrations</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Students per Department</h2>
+            </div>
+            <div class="panel-body">
+                @if (Model.DepartmentSummaries.Any())
+                {
+                    @foreach (var dept in Model.DepartmentSummaries)
+                    {
+                        var pct = maxDeptStudents == 0 ? 0 : (int)Math.Round(dept.StudentCount * 100.0 / maxDeptStudents);
+                        <div class="dept-row">
+                            <div class="dept-row-labels">
+                                <span class="dept-row-name">@dept.DepartmentName</span>
+                                <span class="dept-row-count">@dept.StudentCount student@(dept.StudentCount == 1 ? "" : "s") &middot; @dept.CourseCount course@(dept.CourseCount == 1 ? "" : "s")</span>
+                            </div>
+                            <div class="dept-bar-track">
+                                <div class="dept-bar-fill" style="width:@(pct)%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No departments yet.</p>
+                }
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Recent Registrations</h2>
+                <a asp-controller="Registration" asp-action="Index" class="panel-hint">View all</a>
+            </div>
+            @if (Model.RecentRegistrations.Any())
+            {
+                <ul class="activity-list">
+                    @foreach (var reg in Model.RecentRegistrations)
+                    {
+                        <li>
+                            <div>
+                                <div class="activity-title">@reg.Student.FirstName @reg.Student.LastName</div>
+                                <div class="activity-subtitle">@reg.Course.CourseCode &ndash; @reg.Course.CourseName &middot; @reg.RegistrationDate.ToString("MMM d, yyyy")</div>
+                            </div>
+                            <span class="status-badge @StatusClass(reg.Status)">@reg.Status</span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="empty-hint mb-0">No registrations yet.</p>
+            }
+        </div>
+    </div>
+
+    <div>
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Registration Status</h2>
+            </div>
+            <div class="panel-body">
+                <div class="status-summary">
+                    <span class="status-badge status-active">Active &middot; @Model.ActiveRegistrations</span>
+                    <span class="status-badge status-completed">Completed &middot; @Model.CompletedRegistrations</span>
+                    <span class="status-badge status-dropped">Dropped &middot; @Model.DroppedRegistrations</span>
+                    <span class="status-badge status-cancelled">Cancelled &middot; @Model.CancelledRegistrations</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Upcoming Events</h2>
+                <span class="panel-hint">Sample data</span>
+            </div>
+            <ul class="placeholder-list">
+                <li>
+                    <span class="placeholder-dot"></span>
+                    <div>
+                        <div class="activity-title">Fall Semester Registration Deadline</div>
+                        <span class="activity-subtitle">September 30, 2026</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="placeholder-dot"></span>
+                    <div>
+                        <div class="activity-title">Faculty & Staff Meeting</div>
+                        <span class="activity-subtitle">October 3, 2026</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="placeholder-dot"></span>
+                    <div>
+                        <div class="activity-title">Midterm Exams Begin</div>
+                        <span class="activity-subtitle">October 20, 2026</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Announcements</h2>
+                <span class="panel-hint">Sample data</span>
+            </div>
+            <ul class="placeholder-list">
+                <li>
+                    <span class="placeholder-dot"></span>
+                    <div>
+                        <div class="activity-title">New course catalog published for next term</div>
+                        <span class="activity-subtitle">Posted by Admissions Office</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="placeholder-dot"></span>
+                    <div>
+                        <div class="activity-title">Library hours extended during exam week</div>
+                        <span class="activity-subtitle">Posted by Library Services</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

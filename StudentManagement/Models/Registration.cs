@@ -9,10 +9,14 @@ namespace StudentManagement.Models
         [Key]
         public int RegistrationId { get; set; }
 
+        [Display(Name ="Student Name")]
         public int StudentId { get; set; }
 
+        [Display(Name = "Course Name")]
         public int CourseId { get; set; }
 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
 
