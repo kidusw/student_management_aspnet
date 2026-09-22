@@ -16,6 +16,7 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
   --sidebar-width: 260px;
+  --sidebar-collapsed-width: 76px;
 }
 
 * {
@@ -71,7 +72,37 @@ a {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 20;
+  transition: width 0.2s ease;
+}
+
+.sidebar-collapse-btn {
+  position: fixed;
+  top: 1.35rem;
+  left: calc(var(--sidebar-width) - 14px);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--sidebar-border);
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  z-index: 21;
+  transition: left 0.2s ease, transform 0.2s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.sidebar-collapse-btn:hover {
+  color: #fff;
+  background: var(--sidebar-active-bg);
+}
+
+.sidebar-collapse-btn svg {
+  transition: transform 0.2s ease;
 }
 
 .sidebar-brand {
@@ -166,6 +197,39 @@ a {
   font-size: 0.75rem;
   color: var(--sidebar-text-muted);
   border-top: 1px solid var(--sidebar-border);
+}
+
+/* ---------- Collapsed sidebar ---------- */
+
+.app-shell.sidebar-collapsed .sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+
+.app-shell.sidebar-collapsed .sidebar-collapse-btn {
+  left: calc(var(--sidebar-collapsed-width) - 14px);
+}
+
+.app-shell.sidebar-collapsed .sidebar-collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+.app-shell.sidebar-collapsed .brand-text,
+.app-shell.sidebar-collapsed .nav-section-label,
+.app-shell.sidebar-collapsed .sidebar-footer,
+.app-shell.sidebar-collapsed .sidebar .nav-link span:not(.nav-icon) {
+  display: none;
+}
+
+.app-shell.sidebar-collapsed .sidebar-brand {
+  justify-content: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.app-shell.sidebar-collapsed .sidebar .nav-link {
+  justify-content: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 /* ---------- Main area ---------- */
@@ -340,6 +404,95 @@ p > a {
   flex-wrap: wrap;
   gap: 0.6rem;
   align-items: center;
+}
+
+/* ---------- Create button ---------- */
+
+.btn-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease;
+}
+
+.btn-create svg {
+  flex-shrink: 0;
+}
+
+.btn-create:hover {
+  background: var(--accent-hover);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-create:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Row action links (Edit / Details / Delete) ---------- */
+
+.action-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.action-link svg {
+  flex-shrink: 0;
+}
+
+.action-link-edit {
+  color: #b45309;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.action-link-edit:hover {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.action-link-details {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: #e0e7ff;
+}
+
+.action-link-details:hover {
+  background: #e0e7ff;
+  color: var(--accent-hover);
+}
+
+.action-link-delete {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.action-link-delete:hover {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 /* ---------- Detail card (e.g. Registration details) ---------- */
@@ -573,6 +726,82 @@ p > a {
   gap: 0.6rem;
 }
 
+.pie-chart-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.pie-chart {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pie-chart-hole {
+  position: absolute;
+  inset: 22%;
+  background: var(--surface);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-chart-total {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.pie-chart-total-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pie-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+}
+
+.pie-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.pie-legend-name {
+  color: var(--text);
+  font-weight: 500;
+  flex: 1;
+}
+
+.pie-legend-value {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .status-summary .status-badge {
   font-weight: 600;
 }
@@ -658,6 +887,14 @@ p > a {
 
   .menu-button {
     display: inline-flex;
+  }
+
+  .sidebar-collapse-btn {
+    display: none;
+  }
+
+  .app-shell.sidebar-collapsed .sidebar {
+    width: var(--sidebar-width);
   }
 
   .sidebar-backdrop {
