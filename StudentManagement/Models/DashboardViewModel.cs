@@ -30,5 +30,7 @@ namespace StudentManagement.Models
         public int StudentCount { get; set; }
 
         public int CourseCount { get; set; }
+
+        public int RegistrationCount { get; set; }
     }
 }

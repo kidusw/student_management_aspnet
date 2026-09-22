@@ -19,7 +19,16 @@
     <link rel="stylesheet" href="~/StudentManagement.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="app-shell">
+    <div class="app-shell" id="app-shell">
+        <script>
+            (function () {
+                try {
+                    if (localStorage.getItem("sidebar-collapsed") === "true") {
+                        document.getElementById("app-shell").classList.add("sidebar-collapsed");
+                    }
+                } catch (e) { }
+            })();
+        </script>
         <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-checkbox" />
 
         <aside class="sidebar">
@@ -74,6 +83,10 @@
                 &copy; @DateTime.Now.Year StudentManagement
             </div>
         </aside>
+
+        <button type="button" id="sidebar-collapse-toggle" class="sidebar-collapse-btn" aria-label="Collapse sidebar" title="Collapse sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+        </button>
 
         <label for="sidebar-toggle" class="sidebar-backdrop"></label>
 

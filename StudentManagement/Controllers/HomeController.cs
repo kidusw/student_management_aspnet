@@ -23,7 +23,8 @@ namespace StudentManagement.Controllers
                 {
                     DepartmentName = d.Name,
                     StudentCount = d.Students.Count,
-                    CourseCount = d.Courses.Count
+                    CourseCount = d.Courses.Count,
+                    RegistrationCount = d.Students.Sum(s => s.Registrations.Count)
                 })
                 .ToListAsync();
 

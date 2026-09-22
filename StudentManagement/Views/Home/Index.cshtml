@@ -8,6 +8,24 @@
     var maxDeptStudents = Model.DepartmentSummaries.Any()
         ? Model.DepartmentSummaries.Max(d => d.StudentCount)
         : 0;
+
+    var chartColors = new[] { "#4f46e5", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6" };
+    var totalDeptRegistrations = Model.DepartmentSummaries.Sum(d => d.RegistrationCount);
+    var pieSlices = new List<(string Name, int Count, double Percent, string Color)>();
+    var gradientStops = new List<string>();
+    double cumulativePct = 0;
+    for (int i = 0; i < Model.DepartmentSummaries.Count; i++)
+    {
+        var dept = Model.DepartmentSummaries[i];
+        if (dept.RegistrationCount == 0) { continue; }
+        var color = chartColors[i % chartColors.Length];
+        var pct = totalDeptRegistrations == 0 ? 0 : dept.RegistrationCount * 100.0 / totalDeptRegistrations;
+        var start = cumulativePct;
+        cumulativePct += pct;
+        gradientStops.Add($"{color} {start.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}% {cumulativePct.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}%");
+        pieSlices.Add((dept.DepartmentName, dept.RegistrationCount, pct, color));
+    }
+    var pieGradient = gradientStops.Any() ? string.Join(", ", gradientStops) : "var(--border) 0% 100%";
 }
 
 <div class="stat-grid">
@@ -118,6 +136,39 @@
                     <span class="status-badge status-dropped">Dropped &middot; @Model.DroppedRegistrations</span>
                     <span class="status-badge status-cancelled">Cancelled &middot; @Model.CancelledRegistrations</span>
                 </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Registrations by Department</h2>
+            </div>
+            <div class="panel-body">
+                @if (totalDeptRegistrations > 0)
+                {
+                    <div class="pie-chart-wrap">
+                        <div class="pie-chart" style="background: conic-gradient(@Html.Raw(pieGradient));">
+                            <div class="pie-chart-hole">
+                                <span class="pie-chart-total">@totalDeptRegistrations</span>
+                                <span class="pie-chart-total-label">Total</span>
+                            </div>
+                        </div>
+                        <ul class="pie-legend">
+                            @foreach (var slice in pieSlices)
+                            {
+                                <li class="pie-legend-item">
+                                    <span class="pie-legend-swatch" style="background:@slice.Color"></span>
+                                    <span class="pie-legend-name">@slice.Name</span>
+                                    <span class="pie-legend-value">@slice.Count &middot; @slice.Percent.ToString("F0")%</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-hint mb-0">No registrations yet.</p>
+                }
             </div>
         </div>
 
