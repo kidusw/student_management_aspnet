@@ -7,5 +7,7 @@ namespace StudentManagement.Models
         public string DisplayName { get; set; } = string.Empty;
 
         public bool IsActive { get; set; } = true;
+
+        public string? ProfilePicturePath { get; set; }
     }
 }
