@@ -220,6 +220,8 @@ public class RegistrationController : Controller
 
         await _context.SaveChangesAsync();
 
+        TempData["ToastMessage"] = "Registration created successfully.";
+        TempData["ToastType"] = "success";
         return RedirectToAction(nameof(Index));
     }
 
@@ -303,6 +305,9 @@ public class RegistrationController : Controller
                 throw;
             }
         }
+
+        TempData["ToastMessage"] = "Registration updated successfully.";
+        TempData["ToastType"] = "success";
         return RedirectToAction(nameof(Index));
     }
 
@@ -339,6 +344,8 @@ public class RegistrationController : Controller
         }
 
         await _context.SaveChangesAsync();
+        TempData["ToastMessage"] = "Registration deleted successfully.";
+        TempData["ToastType"] = "success";
         return RedirectToAction(nameof(Index));
     }
 

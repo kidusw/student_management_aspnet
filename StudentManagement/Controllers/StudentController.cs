@@ -78,6 +78,8 @@ public class StudentController : Controller
         {
             _context.Add(student);
             await _context.SaveChangesAsync();
+            TempData["ToastMessage"] = "Student created successfully.";
+            TempData["ToastType"] = "success";
             return RedirectToAction(nameof(Index));
         }
 
@@ -141,6 +143,8 @@ public class StudentController : Controller
                     throw;
                 }
             }
+            TempData["ToastMessage"] = "Student updated successfully.";
+            TempData["ToastType"] = "success";
             return RedirectToAction(nameof(Index));
         }
 
@@ -179,6 +183,8 @@ public class StudentController : Controller
         }
 
         await _context.SaveChangesAsync();
+        TempData["ToastMessage"] = "Student deleted successfully.";
+        TempData["ToastType"] = "success";
         return RedirectToAction(nameof(Index));
     }
 

@@ -873,6 +873,72 @@ p > a {
   font-size: 0.85rem;
 }
 
+/* ---------- Toasts ---------- */
+
+.toast-container {
+  pointer-events: none;
+}
+
+.app-toast {
+  pointer-events: auto;
+  min-width: 300px;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.app-toast .toast-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0.75rem 0 0.75rem 0.9rem;
+}
+
+.app-toast .toast-body {
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.75rem 0.5rem;
+}
+
+.app-toast-success {
+  border-left-color: #15803d;
+}
+
+.app-toast-success .toast-icon {
+  color: #15803d;
+}
+
+.app-toast-danger {
+  border-left-color: #b91c1c;
+}
+
+.app-toast-danger .toast-icon {
+  color: #b91c1c;
+}
+
+.app-toast-warning {
+  border-left-color: #b45309;
+}
+
+.app-toast-warning .toast-icon {
+  color: #b45309;
+}
+
+.app-toast-info {
+  border-left-color: var(--accent);
+}
+
+.app-toast-info .toast-icon {
+  color: var(--accent);
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
