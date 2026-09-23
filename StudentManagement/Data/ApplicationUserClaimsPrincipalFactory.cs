@@ -19,6 +19,7 @@ namespace StudentManagement.Data
         {
             var identity = await base.GenerateClaimsAsync(user);
             identity.AddClaim(new Claim("DisplayName", user.DisplayName));
+            identity.AddClaim(new Claim("ProfilePicturePath", user.ProfilePicturePath ?? string.Empty));
             return identity;
         }
     }

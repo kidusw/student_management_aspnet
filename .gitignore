@@ -17,6 +17,7 @@
 
 # ASP.NET
 wwwroot/lib/
+wwwroot/uploads/
 node_modules/
 
 # User-specific / local config

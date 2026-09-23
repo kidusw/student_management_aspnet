@@ -267,10 +267,23 @@ a {
   margin-left: auto;
 }
 
+.topbar-profile-dropdown {
+  display: flex;
+}
+
 .topbar-profile {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.topbar-profile:hover {
+  background: var(--bg);
 }
 
 .topbar-avatar {
@@ -286,6 +299,10 @@ a {
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.topbar-avatar-img {
+  object-fit: cover;
 }
 
 .topbar-username {
@@ -933,6 +950,34 @@ p > a {
   padding: 1.25rem;
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+/* ---------- Profile page ---------- */
+
+.profile-picture-group {
+  display: flex;
+  align-items: center;
+}
+
+.profile-picture-preview {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.profile-picture-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
 /* ---------- Toasts ---------- */

@@ -148,10 +148,23 @@
                         {
                             initials = "?";
                         }
+                        var profilePicturePath = User.FindFirst("ProfilePicturePath")?.Value;
 
-                        <div class="topbar-profile">
-                            <span class="topbar-avatar" aria-hidden="true">@initials</span>
-                            <span class="topbar-username">@displayName</span>
+                        <div class="dropdown topbar-profile-dropdown">
+                            <button type="button" class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (!string.IsNullOrEmpty(profilePicturePath))
+                                {
+                                    <img src="@profilePicturePath" alt="" class="topbar-avatar topbar-avatar-img" />
+                                }
+                                else
+                                {
+                                    <span class="topbar-avatar" aria-hidden="true">@initials</span>
+                                }
+                                <span class="topbar-username">@displayName</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                            </ul>
                         </div>
                         <form asp-controller="Account" asp-action="Logout" method="post" class="topbar-logout-form">
                             <button type="submit" class="topbar-logout-btn" title="Log out">
