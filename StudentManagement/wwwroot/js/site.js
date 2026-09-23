@@ -37,7 +37,7 @@
 
     var toastEls = container.querySelectorAll(".toast");
     toastEls.forEach(function (el) {
-        var toast = new bootstrap.Toast(el);
+        var toast = new bootstrap.Toast(el, { autohide: true, delay: 4500 });
         el.addEventListener("hidden.bs.toast", function () {
             el.remove();
         });
