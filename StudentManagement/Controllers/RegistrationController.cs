@@ -1,10 +1,12 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentManagement.Models;
 using StudentManagement.Data;
 
 [Route("Registration")]
+[Authorize(Roles = "Admin,Staff,Viewer")]
 public class RegistrationController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -102,6 +104,7 @@ public class RegistrationController : Controller
 
     // GET: REGISTRATIONS/Create
     [HttpGet("Create")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> CreateAsync()
     {
         var registration = new Registration
@@ -179,6 +182,7 @@ public class RegistrationController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost("Create")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Create(RegistrationCreateViewModel vm)
     {
         var registration = vm?.Registration ?? new Registration();
@@ -227,6 +231,7 @@ public class RegistrationController : Controller
 
     // GET: REGISTRATIONS/Edit/5
     [HttpGet("Edit/{id?}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -255,6 +260,7 @@ public class RegistrationController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost("Edit/{id?}")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Edit(int? id, RegistrationCreateViewModel vm)
     {
         var registration = vm?.Registration ?? new Registration();
@@ -313,6 +319,7 @@ public class RegistrationController : Controller
 
     // GET: REGISTRATIONS/Delete/5
     [HttpGet("Delete/{id?}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -335,6 +342,7 @@ public class RegistrationController : Controller
     // POST: REGISTRATIONS/Delete/5
     [HttpPost("Delete/{id?}"), ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
         var registration = await _context.Registrations.FindAsync(id);

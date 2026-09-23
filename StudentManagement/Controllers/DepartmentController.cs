@@ -1,9 +1,11 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentManagement.Models;
 using StudentManagement.Data;
 
+[Authorize(Roles = "Admin,Staff,Viewer")]
 public class DepartmentController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -38,6 +40,7 @@ public class DepartmentController : Controller
     }
 
     // GET: DEPARTMENTS/Create
+    [Authorize(Roles = "Admin,Staff")]
     public IActionResult Create()
     {
         return View();
@@ -48,6 +51,7 @@ public class DepartmentController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Create([Bind("DepartmentId,Name,Description")] Department department)
     {
         if (ModelState.IsValid)
@@ -62,6 +66,7 @@ public class DepartmentController : Controller
     }
 
     // GET: DEPARTMENTS/Edit/5
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -82,6 +87,7 @@ public class DepartmentController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Edit(int? id, [Bind("DepartmentId,Name,Description")] Department department)
     {
         if (id != department.DepartmentId)
@@ -115,6 +121,7 @@ public class DepartmentController : Controller
     }
 
     // GET: DEPARTMENTS/Delete/5
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -135,6 +142,7 @@ public class DepartmentController : Controller
     // POST: DEPARTMENTS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
         var department = await _context.Departments.FindAsync(id);

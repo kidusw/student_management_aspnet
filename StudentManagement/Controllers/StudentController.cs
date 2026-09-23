@@ -1,9 +1,11 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentManagement.Models;
 using StudentManagement.Data;
 
+[Authorize(Roles = "Admin,Staff,Viewer")]
 public class StudentController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -53,6 +55,7 @@ public class StudentController : Controller
     }
 
     // GET: STUDENTS/Create
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Create()
     {
         ViewData["Departments"] = await GetDepartmentSelectListAsync();
@@ -64,6 +67,7 @@ public class StudentController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Create([Bind("StudentId,FirstName,LastName,Age,DateOfBirth,MobileNumber,DepartmentId")] Student student)
     {
         var departmentExists = await _context.Departments
@@ -88,6 +92,7 @@ public class StudentController : Controller
     }
 
     // GET: STUDENTS/Edit/5
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -110,6 +115,7 @@ public class StudentController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Edit(int? id, [Bind("StudentId,FirstName,LastName,Age,DateOfBirth,MobileNumber,DepartmentId")] Student student)
     {
         if (id != student.StudentId)
@@ -153,6 +159,7 @@ public class StudentController : Controller
     }
 
     // GET: STUDENTS/Delete/5
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -174,6 +181,7 @@ public class StudentController : Controller
     // POST: STUDENTS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
         var student = await _context.Students.FindAsync(id);
