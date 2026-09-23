@@ -54,6 +54,8 @@ public class DepartmentController : Controller
         {
             _context.Add(department);
             await _context.SaveChangesAsync();
+            TempData["ToastMessage"] = "Department created successfully.";
+            TempData["ToastType"] = "success";
             return RedirectToAction(nameof(Index));
         }
         return View(department);
@@ -105,6 +107,8 @@ public class DepartmentController : Controller
                     throw;
                 }
             }
+            TempData["ToastMessage"] = "Department updated successfully.";
+            TempData["ToastType"] = "success";
             return RedirectToAction(nameof(Index));
         }
         return View(department);
@@ -123,11 +127,6 @@ public class DepartmentController : Controller
         if (department == null)
         {
             return NotFound();
-        }
-
-        if (TempData["DeleteError"] is string deleteError)
-        {
-            ViewData["DeleteError"] = deleteError;
         }
 
         return View(department);
@@ -149,9 +148,13 @@ public class DepartmentController : Controller
             }
             catch (DbUpdateException)
             {
-                TempData["DeleteError"] = "This department still has students or courses assigned to it. Reassign or remove them before deleting the department.";
+                TempData["ToastMessage"] = "This department still has students or courses assigned to it. Reassign or remove them before deleting the department.";
+                TempData["ToastType"] = "danger";
                 return RedirectToAction(nameof(Delete), new { id });
             }
+
+            TempData["ToastMessage"] = "Department deleted successfully.";
+            TempData["ToastType"] = "success";
         }
 
         return RedirectToAction(nameof(Index));

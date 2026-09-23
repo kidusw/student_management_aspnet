@@ -28,3 +28,19 @@
         setLabel(isCollapsed);
     });
 })();
+
+(function () {
+    var container = document.getElementById("toastContainer");
+    if (!container || typeof bootstrap === "undefined") {
+        return;
+    }
+
+    var toastEls = container.querySelectorAll(".toast");
+    toastEls.forEach(function (el) {
+        var toast = new bootstrap.Toast(el);
+        el.addEventListener("hidden.bs.toast", function () {
+            el.remove();
+        });
+        toast.show();
+    });
+})();

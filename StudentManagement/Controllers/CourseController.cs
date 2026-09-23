@@ -64,6 +64,8 @@ public class CourseController : Controller
         {
             _context.Add(course);
             await _context.SaveChangesAsync();
+            TempData["ToastMessage"] = "Course created successfully.";
+            TempData["ToastType"] = "success";
             return RedirectToAction(nameof(Index));
         }
 
@@ -127,6 +129,8 @@ public class CourseController : Controller
                     throw;
                 }
             }
+            TempData["ToastMessage"] = "Course updated successfully.";
+            TempData["ToastType"] = "success";
             return RedirectToAction(nameof(Index));
         }
 
@@ -165,6 +169,8 @@ public class CourseController : Controller
         }
 
         await _context.SaveChangesAsync();
+        TempData["ToastMessage"] = "Course deleted successfully.";
+        TempData["ToastType"] = "success";
         return RedirectToAction(nameof(Index));
     }
 
